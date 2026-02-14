@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>QUSAI SLATEWALA | Visionary</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -23,13 +23,19 @@
             --secondary: #7000ff;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        /* Only use custom cursor on non-touch devices */
+        @media (hover: hover) {
+            * { cursor: none; }
+        }
 
         body {
             background: var(--bg);
             color: var(--text);
             font-family: 'Space Grotesk', sans-serif;
             overflow-x: hidden;
+            width: 100vw;
         }
 
         /* --- PRELOADER --- */
@@ -41,16 +47,18 @@
         .terminal-text {
             font-family: 'Share Tech Mono', monospace;
             color: var(--accent); font-size: 1.5rem; text-transform: uppercase; letter-spacing: 2px;
+            text-align: center; padding: 1rem;
         }
         .blink { animation: blinker 0.5s linear infinite; }
         @keyframes blinker { 50% { opacity: 0; } }
 
-        /* --- CURSOR --- */
+        /* --- CURSOR (Hidden on Mobile) --- */
         .cursor-dot {
             position: fixed; width: 8px; height: 8px;
             background: var(--accent); border-radius: 50%;
             pointer-events: none; z-index: 1000001; 
             top: 0; left: 0;
+            display: none; /* Hidden by default */
         }
         .cursor-outline {
             position: fixed; width: 50px; height: 50px;
@@ -58,11 +66,17 @@
             border-radius: 50%; pointer-events: none; z-index: 1000000;
             top: 0; left: 0;
             transition: width 0.3s, height 0.3s, border-color 0.3s;
+            display: none; /* Hidden by default */
         }
-        body.hover-active .cursor-outline {
-            width: 80px; height: 80px;
-            background: rgba(0, 243, 255, 0.05);
-            border-color: var(--accent);
+        
+        /* Show cursor only on devices that support hover (Desktops) */
+        @media (hover: hover) {
+            .cursor-dot, .cursor-outline { display: block; }
+            body.hover-active .cursor-outline {
+                width: 80px; height: 80px;
+                background: rgba(0, 243, 255, 0.05);
+                border-color: var(--accent);
+            }
         }
 
         /* --- 3D BACKGROUND --- */
@@ -97,11 +111,12 @@
         }
 
         /* --- HERO --- */
-        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 0 5%; }
+        .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 0 5%; }
         h1 {
-            font-family: 'Syncopate', sans-serif; font-size: 9vw; line-height: 0.85;
+            font-family: 'Syncopate', sans-serif; font-size: 9vw; line-height: 0.95;
             text-transform: uppercase; font-weight: 700; color: transparent;
             -webkit-text-stroke: 1px rgba(255,255,255,0.9); transition: color 0.5s;
+            margin-top: 60px; /* Space for nav on mobile */
         }
         h1:hover { color: var(--text); }
         .hero-tags {
@@ -111,7 +126,7 @@
         }
 
         /* --- VENTURES --- */
-        .ventures-section { padding: 15vh 5%; }
+        .ventures-section { padding: 10vh 5%; }
         .ventures-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; perspective: 1000px; }
         
         .venture-card {
@@ -142,7 +157,7 @@
         .v-content span { font-size: 0.9rem; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; }
 
         /* --- SKILL CLOUD (GOOGLE EARTH STYLE) --- */
-        .skill-section { padding: 10vh 5%; position: relative; }
+        .skill-section { padding: 10vh 5%; position: relative; min-height: 80vh; display:flex; align-items: center; justify-content: center; }
         .skill-container { 
             width: 100%; height: 600px; 
             position: relative; 
@@ -169,7 +184,7 @@
             user-select: none;
         }
         
-        /* Secondary Skill Style (Differentiation) */
+        /* Secondary Skill Style */
         .tag-cloud-item.secondary {
             font-size: 1.1rem;
             color: #888;
@@ -220,13 +235,44 @@
         .modal-content {
             background: #050505; border: 1px solid var(--accent); padding: 3rem; text-align: center;
             max-width: 500px; width: 90%; box-shadow: 0 0 60px rgba(0, 243, 255, 0.15);
+            position: relative;
         }
 
+        /* --- MOBILE OPTIMIZATION --- */
         @media (max-width: 768px) {
-            h1 { font-size: 13vw; } .ventures-grid { grid-template-columns: 1fr; }
-            .deck-container { flex-direction: column; cursor: default; }
-            .holo-card { min-width: auto; width: 100%; height: auto; }
-            .nav-links { display: none; }
+            h1 { font-size: 11vw; margin-top: 100px; } 
+            
+            .nav-links { 
+                position: fixed; bottom: 0; left: 0; width: 100%; 
+                background: rgba(0,0,0,0.9); padding: 1rem; 
+                justify-content: center; gap: 1rem; border-top: 1px solid #333;
+                z-index: 1000;
+                backdrop-filter: blur(10px);
+            }
+            .nav-btn { font-size: 0.75rem; padding: 5px 10px; }
+            .cv-btn { border: 1px solid var(--accent); }
+
+            .hero-tags { font-size: 0.9rem; gap: 1rem; }
+            
+            .ventures-grid { grid-template-columns: 1fr; gap: 2rem; }
+            .venture-card { height: 350px; padding: 1.5rem; }
+            
+            /* Deck becomes vertical stack on mobile */
+            .deck-container { flex-direction: column; width: 100%; padding: 0 5%; cursor: default; }
+            .holo-card { 
+                min-width: unset; /* Remove the 400px limit */
+                width: 100%; 
+                height: auto; 
+                min-height: 300px;
+                margin-bottom: 2rem;
+            }
+
+            .skill-container { height: 400px; }
+            .tag-cloud-item { font-size: 1rem; padding: 5px 10px; }
+            .tag-cloud-item.secondary { font-size: 0.8rem; }
+            
+            /* Footer padding for mobile nav */
+            footer { padding-bottom: 80px; }
         }
     </style>
 </head>
@@ -243,10 +289,10 @@
 
     <div class="modal-overlay" id="emailModal">
         <div class="modal-content">
-            <div style="position:absolute; top:1rem; right:1rem; cursor:pointer; color:#666;" onclick="toggleModal(false)">×</div>
+            <div style="position:absolute; top:1rem; right:1rem; cursor:pointer; color:#666; font-size: 1.5rem;" onclick="toggleModal(false)">×</div>
             <h2 style="font-family: 'Syncopate'; margin-bottom: 1rem; color: white;">Connect</h2>
-            <div style="font-size: 1.5rem; color: var(--accent); margin: 2rem 0; padding: 1rem; border: 1px dashed #333;" id="emailText">qslatewala@gmail.com</div>
-            <button onclick="copyEmail()" class="magnetic-area" style="background: var(--accent); border: none; padding: 12px 35px; font-weight: bold; cursor: pointer; letter-spacing: 1px;">COPY TO CLIPBOARD</button>
+            <div style="font-size: 1rem; color: var(--accent); margin: 2rem 0; padding: 1rem; border: 1px dashed #333; word-break: break-all;" id="emailText">qslatewala@gmail.com</div>
+            <button onclick="copyEmail()" class="magnetic-area" style="background: var(--accent); border: none; padding: 12px 35px; font-weight: bold; cursor: pointer; letter-spacing: 1px; width: 100%;">COPY</button>
         </div>
     </div>
 
@@ -255,7 +301,7 @@
         <div class="nav-links">
             <a href="https://www.linkedin.com/in/qusai-slatewala-b2bbb5377/" target="_blank" class="nav-btn magnetic">LinkedIn</a>
             <a href="#" onclick="generateAndDownloadPDF(event, this)" class="nav-btn cv-btn magnetic">
-                <span class="cv-progress"></span><span style="position: relative; z-index: 2;">DOWNLOAD CV</span>
+                <span class="cv-progress"></span><span style="position: relative; z-index: 2;">CV</span>
             </a>
             <a href="#" onclick="toggleModal(true)" class="nav-btn magnetic">Contact</a>
         </div>
@@ -268,14 +314,13 @@
                 <div class="scramble" style="color: white; -webkit-text-stroke: 0;">SLATEWALA</div>
             </h1>
             <div class="hero-tags">
-                <span>BBA @ PES University</span><span>//</span><span>Visual Artist</span><span>//</span><span>Entrepreneur</span>
+                <span>BBA @ PES University</span><span>//</span><span>Virtual Artist</span><span>//</span><span>entrepreneur</span>
             </div>
         </section>
 
         <section class="ventures-section">
-            <div style="font-family: 'Syncopate'; font-size: 3rem; margin-bottom: 3rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem; display: flex; justify-content: space-between; align-items: flex-end;">
+            <div style="font-family: 'Syncopate'; font-size: 2rem; margin-bottom: 3rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem; display: flex; justify-content: space-between; align-items: flex-end;">
                 <div>VENTURES</div>
-                <div style="font-size: 0.9rem; font-family: 'Space Grotesk'; color: #666;">ENTREPRENEURIAL PURSUITS</div>
             </div>
             <div class="ventures-grid">
                 <div class="venture-card magnetic-area">
@@ -305,7 +350,7 @@
         </section>
 
         <section class="deck-section">
-            <h2 style="padding: 0 5%; font-family: 'Syncopate'; font-size: 3rem; margin-bottom: 4rem; color: white;">The Arsenal</h2>
+            <h2 style="padding: 0 5%; font-family: 'Syncopate'; font-size: 2rem; margin-bottom: 4rem; color: white;">The Arsenal</h2>
             <div class="deck-container" id="draggableDeck">
                 
                 <div class="holo-card card-pes magnetic-area">
@@ -327,9 +372,9 @@
                 </div>
                 
                 <div class="holo-card card-media magnetic-area">
-                    <div class="card-header"><h3>Probe PESU</h3><span>Media Lead / Aug 2025 - Present</span></div>
+                    <div class="card-header"><h3>Probe PESU</h3><span>Media / Aug 2025 - Present</span></div>
                     <div class="card-body">
-                        <p><strong>Media Team Lead</strong></p>
+                        <p><strong>Media Team</strong></p>
                         <p>Responsible for the photography and videography for the events organised by Probe (Media Club) for the BBA Department.</p>
                         <ul><li>BBA Dept Events</li><li>Technical Precision</li></ul>
                     </div>
@@ -418,7 +463,6 @@
         // --- 3. SKILL CLOUD (GOOGLE EARTH STYLE) ---
         // COMBINED SKILLS LIST (Core + Secondary from Profile)
         const skillsData = [
-            // Core Skills (Cyan, Glowing)
             { text: 'AI Agents', type: 'core' },
             { text: 'Video Gen', type: 'core' },
             { text: 'Strategy', type: 'core' },
@@ -431,8 +475,6 @@
             { text: 'Content Creation', type: 'core' },
             { text: 'Team Lead', type: 'core' },
             { text: 'Public Speaking', type: 'core' },
-
-            // Secondary Skills (No Outline, Greyish) - Updated from LinkedIn Profile
             { text: 'Gaming', type: 'secondary' },
             { text: 'Live Streaming', type: 'secondary' },
             { text: 'Team Collab', type: 'secondary' },
@@ -444,13 +486,13 @@
         ];
         
         const cloudContainer = document.getElementById('cloud-container');
-        const r = 280; // Radius
+        // Dynamic Radius based on screen width
+        const r = window.innerWidth < 768 ? 140 : 280; 
         
         skillsData.forEach((skill, i) => {
             const el = document.createElement('div');
             el.className = 'tag-cloud-item';
             
-            // Add secondary class if not core
             if (skill.type === 'secondary') {
                 el.classList.add('secondary');
             }
@@ -458,7 +500,6 @@
             el.innerText = skill.text;
             cloudContainer.appendChild(el);
             
-            // Spherical Distribution
             const phi = Math.acos(-1 + (2 * i) / skillsData.length);
             const theta = Math.sqrt(skillsData.length * Math.PI) * phi;
             
@@ -481,32 +522,44 @@
             startY = e.clientY;
             cloudContainer.style.cursor = "grabbing";
         });
+        
+        // Touch support for mobile sphere rotation
+        cloudContainer.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        }, {passive: false});
 
-        window.addEventListener('mouseup', () => {
-            isDragging = false;
-            cloudContainer.style.cursor = "grab";
-        });
+        window.addEventListener('mouseup', () => { isDragging = false; cloudContainer.style.cursor = "grab"; });
+        window.addEventListener('touchend', () => { isDragging = false; });
 
         window.addEventListener('mousemove', (e) => {
             if (isDragging) {
                 const deltaX = e.clientX - startX;
                 const deltaY = e.clientY - startY;
-                
-                // Update target rotation based on drag
                 targetRotationY += deltaX * 0.005;
-                targetRotationX -= deltaY * 0.005; // Invert Y for natural feel
-                
+                targetRotationX -= deltaY * 0.005; 
                 startX = e.clientX;
                 startY = e.clientY;
             }
         });
+        
+        // Touch move support
+        window.addEventListener('touchmove', (e) => {
+            if (isDragging) {
+                const deltaX = e.touches[0].clientX - startX;
+                const deltaY = e.touches[0].clientY - startY;
+                targetRotationY += deltaX * 0.005;
+                targetRotationX -= deltaY * 0.005; 
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+            }
+        }, {passive: false});
 
         function animateCloud() {
-            // Inertia / Smoothing
             currentRotationX += (targetRotationX - currentRotationX) * 0.05;
             currentRotationY += (targetRotationY - currentRotationY) * 0.05;
 
-            // Auto-drift when not dragging
             if (!isDragging) {
                 targetRotationY += 0.001;
             }
@@ -516,19 +569,14 @@
                 let y = parseFloat(el.dataset.baseY);
                 let z = parseFloat(el.dataset.baseZ);
 
-                // Rotation Matrix Math
                 let cosX = Math.cos(currentRotationX), sinX = Math.sin(currentRotationX);
                 let cosY = Math.cos(currentRotationY), sinY = Math.sin(currentRotationY);
 
-                // Rotate around Y
                 let x1 = x * cosY - z * sinY;
                 let z1 = z * cosY + x * sinY;
-                
-                // Rotate around X
                 let y2 = y * cosX - z1 * sinX;
                 let z2 = z1 * cosX + y * sinX;
 
-                // Projection
                 let scale = 1.4 / (2 - z2 / r);
                 let alpha = (z2 + r) / (2 * r);
                 
@@ -552,9 +600,7 @@
             span.innerText = "GENERATING...";
             gsap.to(progress, { width: '50%', duration: 1 });
 
-            // Header
             doc.setFillColor(0, 0, 0);
-            // Height increased to 50 to accommodate new line
             doc.rect(0, 0, 210, 50, "F"); 
             doc.setTextColor(255, 255, 255);
             doc.setFontSize(26);
@@ -565,14 +611,11 @@
             doc.text("qslatewala@gmail.com | Bengaluru, Karnataka", 20, 32);
             doc.text("www.linkedin.com/in/qusai-slatewala-b2bbb5377", 20, 38);
             
-            // --- NEW WEBSITE LINK ---
-            // Using window.location.host so it works automatically when you deploy to Vercel
             let siteLink = "Portfolio: " + (window.location.host ? "https://" + window.location.host : "https://qusai-slatewala.vercel.app");
             doc.text(siteLink, 20, 44);
 
-            let y = 65; // Started lower (was 60)
+            let y = 65; 
 
-            // Summary
             doc.setTextColor(0, 0, 0);
             doc.setFontSize(12);
             doc.setFont("helvetica", "bold");
@@ -587,14 +630,12 @@
             doc.text(splitSummary, 20, y);
             y += 18;
 
-            // Experience
             doc.setFontSize(12);
             doc.setFont("helvetica", "bold");
             doc.text("EXPERIENCE", 20, y);
             doc.line(20, y+2, 190, y+2);
             y += 10;
 
-            // Probe
             doc.setFontSize(11);
             doc.text("Probe PESU - Media Team Lead", 20, y);
             doc.setFontSize(9);
@@ -607,7 +648,6 @@
             doc.text("• Combining creativity with technical precision.", 25, y);
             y += 10;
 
-            // HR Club
             doc.setFontSize(11);
             doc.setFont("helvetica", "bold");
             doc.text("People's Partner HR Club - Photographer", 20, y);
@@ -621,7 +661,6 @@
             doc.text("• Capturing authentic moments and high-quality visuals.", 25, y);
             y += 10;
 
-             // Freelance
             doc.setFontSize(11);
             doc.setFont("helvetica", "bold");
             doc.text("Freelance Photography", 20, y);
@@ -633,7 +672,6 @@
             doc.text("• Sports events, pre-wedding shoots, and brand campaigns.", 25, y);
             y += 15;
 
-            // Education
             doc.setFontSize(12);
             doc.setFont("helvetica", "bold");
             doc.text("EDUCATION", 20, y);
@@ -655,7 +693,6 @@
             doc.text("Commerce | 2023 - 2025", 20, y+5);
             y += 15;
 
-            // Skills
             doc.setFontSize(12);
             doc.setFont("helvetica", "bold");
             doc.text("SKILLS & TOOLS", 20, y);
@@ -667,7 +704,6 @@
             y += 6;
             doc.text("Gear: Nikon D5500, DJI Osmo Pocket 3, DJI Mobile SE, OnePlus 13", 20, y);
 
-            // Finish
             gsap.to(progress, { width: '100%', duration: 0.5, onComplete: () => {
                 doc.save("Qusai_Slatewala_Resume.pdf"); 
                 span.innerText = "DOWNLOADED";
@@ -732,7 +768,6 @@
             renderer.render(scene, camera);
             requestAnimationFrame(animate3D);
         }
-        // Fix for mouseY undefined
         let mouseY = 0;
         window.addEventListener('mousemove', e => mouseY = e.clientY);
         animate3D();
