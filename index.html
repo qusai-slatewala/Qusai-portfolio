@@ -554,7 +554,8 @@
 
             // Header
             doc.setFillColor(0, 0, 0);
-            doc.rect(0, 0, 210, 45, "F");
+            // Height increased to 50 to accommodate new line
+            doc.rect(0, 0, 210, 50, "F"); 
             doc.setTextColor(255, 255, 255);
             doc.setFontSize(26);
             doc.setFont("helvetica", "bold");
@@ -563,8 +564,13 @@
             doc.setFont("helvetica", "normal");
             doc.text("qslatewala@gmail.com | Bengaluru, Karnataka", 20, 32);
             doc.text("www.linkedin.com/in/qusai-slatewala-b2bbb5377", 20, 38);
+            
+            // --- NEW WEBSITE LINK ---
+            // Using window.location.host so it works automatically when you deploy to Vercel
+            let siteLink = "Portfolio: " + (window.location.host ? "https://" + window.location.host : "https://qusai-slatewala.vercel.app");
+            doc.text(siteLink, 20, 44);
 
-            let y = 60;
+            let y = 65; // Started lower (was 60)
 
             // Summary
             doc.setTextColor(0, 0, 0);
