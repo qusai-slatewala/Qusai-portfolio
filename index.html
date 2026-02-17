@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -114,36 +114,33 @@
         /* --- HERO --- */
         .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 0 5%; }
         
-        /* --- NEW PROFILE IMAGE STYLES (ADDED) --- */
+        /* --- NEW PROFILE IMAGE STYLES (UPDATED FOR DOT ART) --- */
         .profile-wrapper {
             width: 150px;
             height: 150px;
             margin-bottom: 2rem;
             position: relative;
             z-index: 10;
-            align-self: flex-start; /* Aligns left with text, remove if you want center */
+            align-self: flex-start; 
         }
         .profile-img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* The Cyberpunk Filter */
-            filter: grayscale(100%) contrast(1.2) brightness(0.9);
+            /* High contrast B&W to define shapes for the dots */
+            filter: grayscale(100%) contrast(3) brightness(1.1);
             border: 1px solid var(--accent);
-            /* Pixelated rendering for that "digital" look */
-            image-rendering: pixelated; 
         }
-        /* Scanline Overlay Effect */
+        /* Dot Grid Overlay Effect */
         .profile-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: repeating-linear-gradient(
-                to bottom,
-                transparent 0px,
-                transparent 2px,
-                rgba(0, 243, 255, 0.1) 3px,
-                rgba(0, 243, 255, 0.1) 4px
-            );
+            /* Creates the cyan dot grid pattern */
+            background-image: radial-gradient(circle at center, var(--accent) 30%, transparent 31%);
+            background-size: 5px 5px; /* Density of dots */
             pointer-events: none;
+            /* Blends dots over the high-contrast image */
+            mix-blend-mode: hard-light;
+            opacity: 0.9;
             box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
         }
 
