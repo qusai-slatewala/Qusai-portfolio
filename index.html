@@ -113,11 +113,45 @@
 
         /* --- HERO --- */
         .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 0 5%; }
+        
+        /* --- NEW PROFILE IMAGE STYLES (ADDED) --- */
+        .profile-wrapper {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 10;
+            align-self: flex-start; /* Aligns left with text, remove if you want center */
+        }
+        .profile-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* The Cyberpunk Filter */
+            filter: grayscale(100%) contrast(1.2) brightness(0.9);
+            border: 1px solid var(--accent);
+            /* Pixelated rendering for that "digital" look */
+            image-rendering: pixelated; 
+        }
+        /* Scanline Overlay Effect */
+        .profile-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent 0px,
+                transparent 2px,
+                rgba(0, 243, 255, 0.1) 3px,
+                rgba(0, 243, 255, 0.1) 4px
+            );
+            pointer-events: none;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+        }
+
         h1 {
             font-family: 'Syncopate', sans-serif; font-size: 9vw; line-height: 0.95;
             text-transform: uppercase; font-weight: 700; color: transparent;
             -webkit-text-stroke: 1px rgba(255,255,255,0.9); transition: color 0.5s;
-            margin-top: 60px; /* Space for nav on mobile */
+            margin-top: 10px;
         }
         h1:hover { color: var(--text); }
         .hero-tags {
@@ -241,8 +275,10 @@
 
         /* --- MOBILE OPTIMIZATION --- */
         @media (max-width: 768px) {
-            h1 { font-size: 11vw; margin-top: 100px; } 
+            h1 { font-size: 11vw; margin-top: 20px; } 
             
+            .profile-wrapper { width: 120px; height: 120px; align-self: center; } /* Center photo on mobile */
+
             .nav-links { 
                 position: fixed; bottom: 0; left: 0; width: 100%; 
                 background: rgba(0,0,0,0.9); padding: 1rem; 
@@ -310,6 +346,11 @@
 
     <main>
         <section class="hero">
+            <div class="profile-wrapper magnetic-area">
+                <img src="me.png" alt="Qusai Slatewala" class="profile-img">
+                <div class="profile-overlay"></div>
+            </div>
+
             <h1 class="scramble-group">
                 <div class="scramble">QUSAI</div>
                 <div class="scramble" style="color: white; -webkit-text-stroke: 0;">SLATEWALA</div>
@@ -373,9 +414,9 @@
                 </div>
                 
                 <div class="holo-card card-media magnetic-area">
-                    <div class="card-header"><h3>Probe PESU</h3><span>Media / Aug 2025 - Present</span></div>
+                    <div class="card-header"><h3>Probe PESU</h3><span>Media Lead / Aug 2025 - Present</span></div>
                     <div class="card-body">
-                        <p><strong>Media Team</strong></p>
+                        <p><strong>Media Team Lead</strong></p>
                         <p>Responsible for the photography and videography for the events organised by Probe (Media Club) for the BBA Department.</p>
                         <ul><li>BBA Dept Events</li><li>Technical Precision</li></ul>
                     </div>
