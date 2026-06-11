@@ -753,7 +753,7 @@
             });
         });
 // --- PRO CV GENERATOR ---
-      // --- PRO CV GENERATOR ---
+     // --- PRO CV GENERATOR ---
         async function generateCreativePDF(e, btn) {
             e.preventDefault();
             const { jsPDF } = window.jspdf;
@@ -766,39 +766,54 @@
 
             const cvElement = document.getElementById('cv-template');
             
-            // 1. Temporarily bring the CV into the viewport (hidden behind the website)
-            // This forces the browser to load the images and stops cropping glitches
+            // 1. Temporarily position the CV at the absolute top of the page
             const originalTop = cvElement.style.top;
             const originalPosition = cvElement.style.position;
+            const originalZ = cvElement.style.zIndex;
             
             cvElement.style.position = 'absolute';
             cvElement.style.top = '0px';
-            cvElement.style.zIndex = '-1000'; 
+            cvElement.style.left = '0px';
+            cvElement.style.zIndex = '99999'; 
             
-            // 2. Give the browser 500 milliseconds to actually render the missing photo
+            // 2. Hide the main website elements so they don't bleed into the screenshot
+            const siteElements = document.querySelectorAll('nav, main, canvas, .cursor-dot, .cursor-outline');
+            siteElements.forEach(el => el.style.opacity = '0');
+            
+            // 3. Give the browser 500ms to render the photo and banner
             await new Promise(resolve => setTimeout(resolve, 500));
             
             try {
-                // 3. Force html2canvas to capture exactly 800px, ignoring screen size
                 const canvas = await html2canvas(cvElement, { 
                     scale: 2, 
                     useCORS: true,
                     allowTaint: true,
                     windowWidth: 800,
-                    scrollX: 0,
-                    scrollY: 0
+                    width: 800
                 });
                 
-                // 4. Put the CV template back off-screen instantly
+                // 4. Instantly restore the website UI
                 cvElement.style.position = originalPosition;
                 cvElement.style.top = originalTop;
+                cvElement.style.zIndex = originalZ;
+                siteElements.forEach(el => el.style.opacity = '1');
                 
                 const imgData = canvas.toDataURL('image/png');
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                let pdfHeight = (canvas.height * pdfWidth) / canvas.width;
                 
-                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                // 5. Dynamic Scaling: If the CV is still slightly too tall, scale it to fit the A4 page perfectly
+                if (pdfHeight > pageHeight) {
+                    const ratio = pageHeight / pdfHeight;
+                    pdfHeight = pageHeight;
+                    const scaledWidth = pdfWidth * ratio;
+                    const xOffset = (pdfWidth - scaledWidth) / 2;
+                    pdf.addImage(imgData, 'PNG', xOffset, 0, scaledWidth, pdfHeight);
+                } else {
+                    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                }
                 
                 gsap.to(progress, { width: '100%', duration: 0.5, onComplete: () => {
                     pdf.save("Qusai_Slatewala_Pro_CV.pdf"); 
@@ -808,10 +823,11 @@
                 }});
             } catch (error) {
                 console.error("PDF Generation Failed", error);
-                
-                // Make sure to hide it again even if it fails
+                // Ensure UI is restored even if it fails
                 cvElement.style.position = originalPosition;
                 cvElement.style.top = originalTop;
+                cvElement.style.zIndex = originalZ;
+                siteElements.forEach(el => el.style.opacity = '1');
                 
                 span.innerText = "ERROR";
                 setTimeout(() => { span.innerText = original; }, 2000);
