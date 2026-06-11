@@ -768,6 +768,7 @@
             });
         });
 // --- PRO CV GENERATOR ---
+      // --- PRO CV GENERATOR ---
         async function generateCreativePDF(e, btn) {
             e.preventDefault();
             const { jsPDF } = window.jspdf;
@@ -780,10 +781,34 @@
 
             const cvElement = document.getElementById('cv-template');
             
+            // 1. Temporarily bring the CV into the viewport (hidden behind the website)
+            // This forces the browser to load the images and stops cropping glitches
+            const originalTop = cvElement.style.top;
+            const originalPosition = cvElement.style.position;
+            
+            cvElement.style.position = 'absolute';
+            cvElement.style.top = '0px';
+            cvElement.style.zIndex = '-1000'; 
+            
+            // 2. Give the browser 500 milliseconds to actually render the missing photo
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
             try {
-                const canvas = await html2canvas(cvElement, { scale: 2, useCORS: true });
-                const imgData = canvas.toDataURL('image/png');
+                // 3. Force html2canvas to capture exactly 800px, ignoring screen size
+                const canvas = await html2canvas(cvElement, { 
+                    scale: 2, 
+                    useCORS: true,
+                    allowTaint: true,
+                    windowWidth: 800,
+                    scrollX: 0,
+                    scrollY: 0
+                });
                 
+                // 4. Put the CV template back off-screen instantly
+                cvElement.style.position = originalPosition;
+                cvElement.style.top = originalTop;
+                
+                const imgData = canvas.toDataURL('image/png');
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 const pdfWidth = pdf.internal.pageSize.getWidth();
                 const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
@@ -798,6 +823,11 @@
                 }});
             } catch (error) {
                 console.error("PDF Generation Failed", error);
+                
+                // Make sure to hide it again even if it fails
+                cvElement.style.position = originalPosition;
+                cvElement.style.top = originalTop;
+                
                 span.innerText = "ERROR";
                 setTimeout(() => { span.innerText = original; }, 2000);
             }
